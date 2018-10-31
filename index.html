@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style media="screen">
+  body{
+    background-color: #60d2ff
+  }
+  @font-face{
+    font-family:Halloween;
+
+    src:url('arachnids-1.ttf');
+  }
+      #canvas{
+        margin-left:550px;
+
+        border:1px solid black;
+      }
+      div{
+        font-size:80px;
+        font-family:Halloween;
+        text-align: center;
+      }
+  </style>
+  <script src='ghost.js'></script>
+    <script src='game.js'></script>
+        <script src='suger.js'></script>
+</head>
+
+
+<body>
+  <div>HALLOWEEN</div>
+  <canvas id="canvas" width="600" height="600"></canvas>
+</body>
+<script>
+var canvas=document.getElementById('canvas');
+var ctx=canvas.getContext('2d');
+var gh=new ghost();
+var g=new game();
+var ss=[];
+var rs=[];
+var score=0;
+g.registerAction("a",function(){gh.moveleft()});
+g.registerAction("d",function(){gh.moveright()});
+g.registerAction("s",function(){gh.movedown()});
+g.registerAction("w",function(){gh.moveup()});
+var s2=setInterval(function(){
+  newsuger();
+}, 800)
+var s=setInterval(function(){
+  ctx.clearRect(0,0,600,600)
+  var actions=Object.keys(g.actions);
+  for(var i=0;i<actions.length;i++)
+  {
+    var key=actions[i]
+    if(g.keydown[key])
+    {
+      g.actions[key]()
+    }
+  }
+    draw(gh);
+    for(var i=0;i<ss.length;i++)
+    crush(gh,ss[i]);
+    for(var i=0;i<ss.length;i++)
+    {
+      if(ss[i].x>600)
+      ss.shift();
+      else {
+        if(ss[i].flag==1)
+        drawsu(ss[i])
+      }
+    }
+    ctx.fillStyle="red"
+    ctx.font="30px serif"
+    ctx.fillText("SCORE:"+score,10,580)
+    console.log(ss.length)
+},1000/30)
+function draw(image)
+{
+  var img=new Image();
+  img.src=image.image;
+  img.onload=function()
+  {
+  }
+  ctx.drawImage(img,image.x,image.y,image.w,image.h);
+}
+function newsuger()
+{
+  var su=new suger();
+  su.x=0;
+  su.y=Math.random()*(550+1);
+  ss.push(su);
+}
+function drawsu(sug)
+{
+  ctx.save();
+  ctx.translate(sug.x+25,sug.y+25);
+  ctx.rotate(sug.deg);
+  sug.deg=20*Math.PI/180+sug.deg;
+  ctx.translate(-sug.x-25,-sug.y-25);
+  draw(sug);
+  sug.x=sug.x+10;
+  ctx.restore();
+}
+function crush(x1,x2)
+{
+  if(x2.flag==1)
+  {
+    if((x2.x+x2.w)>(x1.x+20)&&x2.x<(x1.x+x1.w-20))
+    {
+      if((x2.y+x2.h)>(x1.y+20)&&x2.y<(x1.y+x1.h-20))
+      {x2.flag=0; score=score+10;}
+    }
+  }
+
+
+}
+</script>
+</html>
